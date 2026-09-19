@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ExtendPad: use your iPad as a wired second display for your Mac</title>
 <meta name="description" content="A free, tethered, Sidecar-style second display for iPads, old and new. Plug in a cable and your iPad becomes an extra screen for your Mac, with touch. No Wi-Fi, no account, no subscription.">
-<meta name="theme-color" content="#212126">
+<meta name="theme-color" content="#ffffff">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta property="og:title" content="ExtendPad: your iPad as a wired second display">
@@ -13,15 +13,17 @@
 <meta property="og:image" content="assets/icon-512.png">
 <style>
   :root {
-    --dark: #212126;
-    --darker: #17171a;
-    --card: #2a2a30;
-    --line: rgba(255,255,255,.09);
-    --text: #f4f4f6;
-    --muted: rgba(255,255,255,.62);
-    --faint: rgba(255,255,255,.38);
+    --dark: #ffffff;            /* page background */
+    --darker: #fbf7f2;          /* alternate section background (faint warm tint) */
+    --card: #ffffff;
+    --line: rgba(33,33,38,.10);
+    --text: #212126;
+    --muted: rgba(33,33,38,.68);
+    --faint: rgba(33,33,38,.48);
     --orange: #ee7524;
     --orange-hi: #f79a1a;
+    --orange-ink: #c2570d;      /* orange for text on light backgrounds */
+    --shadow: 0 1px 2px rgba(33,33,38,.05), 0 10px 28px rgba(33,33,38,.06);
     --radius: 22px;
     --font: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   }
@@ -42,19 +44,26 @@
   nav ul a { text-decoration: none; }
   nav ul a:hover { color: var(--text); }
 
+  .nav-cta { background: linear-gradient(160deg, var(--orange-hi), var(--orange)); color: #1b1004 !important; font-weight: 700; padding: 9px 20px; border-radius: 99px; box-shadow: 0 6px 16px rgba(238,117,36,.28); }
+  .nav-cta:hover { color: #1b1004 !important; filter: brightness(1.05); }
+
   /* Hero */
-  .hero { position: relative; text-align: center; padding: 56px 0 84px; overflow: hidden; }
+  .hero { position: relative; text-align: center; padding: 48px 0 72px; overflow: hidden; }
   .hero::before {
     content: ""; position: absolute; left: 50%; top: 40%; width: 900px; height: 900px; translate: -50% -50%;
-    background: radial-gradient(closest-side, rgba(238,117,36,.22), transparent);
+    background: radial-gradient(closest-side, rgba(247,154,26,.20), transparent);
     animation: pulse 9s ease-in-out infinite; pointer-events: none;
   }
   @keyframes pulse { 50% { opacity: .55; scale: 1.08; } }
   @media (prefers-reduced-motion: reduce) { .hero::before { animation: none; } }
   .hero > * { position: relative; }
-  .app-icon { width: 132px; height: 132px; border-radius: 30px; box-shadow: 0 18px 50px rgba(238,117,36,.35), 0 2px 0 rgba(255,255,255,.12) inset; }
-  .eyebrow { margin: 26px 0 0; font-size: 13px; font-weight: 600; letter-spacing: .22em; color: rgba(238,117,36,.85); text-transform: uppercase; }
-  h1 { font-size: clamp(36px, 6vw, 64px); line-height: 1.06; margin: 12px auto 0; max-width: 16ch; letter-spacing: -.02em; }
+  .app-icon { width: 132px; height: 132px; border-radius: 30px; box-shadow: 0 18px 44px rgba(238,117,36,.30), 0 2px 0 rgba(255,255,255,.35) inset; }
+  .eyebrow { margin: 26px 0 0; font-size: 13px; font-weight: 600; letter-spacing: .22em; color: var(--orange-ink); text-transform: uppercase; }
+  h1 span { display: block; background: linear-gradient(100deg, var(--orange-hi), var(--orange-ink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .badge { display: inline-flex; align-items: center; gap: 8px; margin-top: 30px; padding: 7px 16px; border: 1px solid var(--line); border-radius: 99px; font-size: 13px; font-weight: 600; color: var(--muted); background: var(--card); }
+  .badge i { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); }
+  .scene { display: block; width: min(880px, 100%); height: auto; margin: 48px auto 0; filter: drop-shadow(0 30px 40px rgba(33,33,38,.14)); }
+  h1 { font-size: clamp(36px, 6vw, 64px); line-height: 1.06; margin: 12px auto 0; max-width: 22ch; letter-spacing: -.02em; }
   .lede { margin: 22px auto 0; max-width: 50ch; font-size: clamp(17px, 2vw, 20px); color: var(--muted); }
   .cta { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 36px; }
   .btn {
@@ -64,8 +73,8 @@
   }
   .btn small { font-size: 12px; font-weight: 500; opacity: .78; }
   .btn:hover { transform: translateY(-2px); }
-  .btn.primary { background: linear-gradient(160deg, var(--orange-hi), var(--orange)); color: #1b1004; border-color: transparent; }
-  .btn.secondary { background: var(--card); }
+  .btn.primary { background: linear-gradient(160deg, var(--orange-hi), var(--orange)); color: #1b1004; border-color: transparent; box-shadow: 0 8px 22px rgba(238,117,36,.30); }
+  .btn.secondary { background: var(--card); color: var(--text); box-shadow: var(--shadow); }
   .btn[aria-disabled="true"] { opacity: .55; pointer-events: none; }
   .fine { margin-top: 18px; font-size: 13px; color: var(--faint); }
 
@@ -75,14 +84,14 @@
   h2 { font-size: clamp(26px, 3.6vw, 38px); margin: 0 0 10px; letter-spacing: -.01em; }
   .sub { color: var(--muted); max-width: 60ch; margin: 0 0 40px; }
   .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow); }
   .card h3 { margin: 14px 0 6px; font-size: 18px; }
   .card p { margin: 0; color: var(--muted); font-size: 15px; }
-  .ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: rgba(238,117,36,.14); color: var(--orange-hi); }
+  .ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: rgba(238,117,36,.12); color: var(--orange-ink); }
   .ico svg { width: 24px; height: 24px; }
 
   .steps { counter-reset: s; display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); padding: 0; list-style: none; margin: 0; }
-  .steps li { counter-increment: s; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; }
+  .steps li { counter-increment: s; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow); }
   .steps li::before {
     content: counter(s); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
     background: var(--orange); color: #1b1004; font-weight: 800; margin-bottom: 14px;
@@ -90,16 +99,16 @@
   .steps b { display: block; font-size: 18px; margin-bottom: 4px; }
   .steps span { color: var(--muted); font-size: 15px; }
 
-  table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; font-size: 15px; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; font-size: 15px; box-shadow: var(--shadow); }
   th, td { text-align: left; padding: 15px 20px; border-bottom: 1px solid var(--line); vertical-align: top; }
   th { width: 28%; color: var(--muted); font-weight: 600; }
   tr:last-child th, tr:last-child td { border-bottom: 0; }
-  .tag { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 12px; font-weight: 700; background: rgba(238,117,36,.16); color: var(--orange-hi); margin-left: 6px; }
+  .tag { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 12px; font-weight: 700; background: rgba(238,117,36,.14); color: var(--orange-ink); margin-left: 6px; }
 
-  details { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 4px 22px; margin-bottom: 12px; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 4px 22px; margin-bottom: 12px; box-shadow: var(--shadow); }
   summary { cursor: pointer; padding: 16px 0; font-weight: 600; font-size: 17px; list-style-position: outside; }
   details p { margin: 0 0 18px; color: var(--muted); }
-  code { background: rgba(255,255,255,.08); padding: 1px 7px; border-radius: 6px; font-size: .92em; }
+  code { background: rgba(33,33,38,.07); padding: 1px 7px; border-radius: 6px; font-size: .92em; }
 
   footer { padding: 44px 0 56px; color: var(--faint); font-size: 13px; text-align: center; border-top: 1px solid var(--line); }
   footer p { margin: 4px 0; }
@@ -107,7 +116,7 @@
 
   @media (max-width: 640px) {
     nav ul { gap: 16px; font-size: 14px; }
-    nav ul li:nth-child(n+3) { display: none; }
+    nav ul li:nth-child(n+2):nth-child(-n+4) { display: none; }
     th { width: 34%; }
   }
 </style>
@@ -122,21 +131,59 @@
       <li><a href="#compat">Compatibility</a></li>
       <li><a href="#faq">FAQ</a></li>
       <li><a href="privacy.html">Privacy</a></li>
+      <li><a class="nav-cta" href="https://github.com/lowvoltageltd/extendpad-site/releases/latest/download/ExtendPad.dmg">Download</a></li>
     </ul>
   </nav>
 </div>
 
 <header class="hero" id="top">
   <div class="wrap">
-    <img class="app-icon" src="assets/icon-512.png" alt="ExtendPad app icon: a laptop and an iPad joined by a cable" width="132" height="132">
     <p class="eyebrow">Tethered iPad display</p>
-    <h1>Your iPad, as a wired second screen.</h1>
+    <h1>Your iPad,<span>as a wired second screen.</span></h1>
     <p class="lede">A tethered, Sidecar-style display for iPads, old and new. Plug in a cable and your Mac gets an extra screen, with touch. No Wi-Fi, no account, and completely free.</p>
     <div class="cta">
       <a class="btn primary" href="https://github.com/lowvoltageltd/extendpad-site/releases/latest/download/ExtendPad.dmg">Download for Mac<small>Free · macOS 13 or later</small></a>
       <a class="btn secondary" href="#" aria-disabled="true">iPad app on the App Store<small>Free · coming soon</small></a>
     </div>
     <p class="fine">You need both: the Mac app (this download) and the iPad app.</p>
+    <div class="badge"><i></i>Works on iPads from the mini 4 to the latest Pro · iOS 15+</div>
+
+    <svg class="scene" viewBox="0 0 1000 520" role="img" aria-label="A laptop and an iPad joined by a cable, sharing one desktop">
+      <defs>
+        <linearGradient id="wall" gradientUnits="userSpaceOnUse" x1="40" y1="20" x2="960" y2="490">
+          <stop offset="0" stop-color="#ffe3c8"/><stop offset=".55" stop-color="#ffb27a"/><stop offset="1" stop-color="#f0782a"/>
+        </linearGradient>
+      </defs>
+      <!-- cable, drawn first so both devices overlap the plug ends -->
+      <path d="M505 307 C585 307 565 370 640 370" fill="none" stroke="#3a3a42" stroke-width="14" stroke-linecap="round"/>
+      <rect x="494" y="296" width="36" height="22" rx="6" fill="#8d8d99"/>
+      <rect x="608" y="357" width="40" height="26" rx="6" fill="#8d8d99"/>
+      <!-- laptop -->
+      <rect x="40" y="20" width="440" height="280" rx="22" fill="#26262b"/>
+      <rect x="54" y="34" width="412" height="252" rx="11" fill="url(#wall)"/>
+      <rect x="54" y="34" width="412" height="18" rx="11" fill="#ffffff" opacity=".5"/>
+      <circle cx="70" cy="43" r="3.5" fill="#26262b" opacity=".55"/><circle cx="82" cy="43" r="3.5" fill="#26262b" opacity=".35"/>
+      <rect x="88" y="76" width="248" height="164" rx="11" fill="#ffffff" opacity=".93"/>
+      <circle cx="104" cy="92" r="4.5" fill="#ff5f57"/><circle cx="118" cy="92" r="4.5" fill="#febc2e"/><circle cx="132" cy="92" r="4.5" fill="#28c840"/>
+      <rect x="106" y="116" width="150" height="9" rx="4.5" fill="#26262b" opacity=".75"/>
+      <rect x="106" y="136" width="206" height="7" rx="3.5" fill="#26262b" opacity=".18"/>
+      <rect x="106" y="152" width="188" height="7" rx="3.5" fill="#26262b" opacity=".18"/>
+      <rect x="106" y="168" width="214" height="7" rx="3.5" fill="#26262b" opacity=".18"/>
+      <rect x="106" y="192" width="78" height="22" rx="11" fill="#ee7524"/>
+      <rect x="10" y="298" width="500" height="22" rx="11" fill="#e4e4ea"/>
+      <rect x="210" y="298" width="100" height="8" rx="4" fill="#cfcfd8"/>
+      <!-- iPad -->
+      <rect x="640" y="250" width="320" height="240" rx="30" fill="#26262b"/>
+      <rect x="654" y="264" width="292" height="212" rx="18" fill="url(#wall)"/>
+      <rect x="676" y="290" width="200" height="150" rx="11" fill="#ffffff" opacity=".93"/>
+      <rect x="694" y="312" width="110" height="9" rx="4.5" fill="#26262b" opacity=".75"/>
+      <rect x="694" y="332" width="164" height="7" rx="3.5" fill="#26262b" opacity=".18"/>
+      <rect x="694" y="348" width="140" height="7" rx="3.5" fill="#26262b" opacity=".18"/>
+      <rect x="694" y="364" width="156" height="7" rx="3.5" fill="#26262b" opacity=".18"/>
+      <circle cx="904" cy="322" r="26" fill="#ee7524"/>
+      <path d="M909 305 L892 326 H902 L899 340 L916 318 H906z" fill="#ffffff"/>
+    </svg>
+
   </div>
 </header>
 
