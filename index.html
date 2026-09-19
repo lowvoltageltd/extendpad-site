@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExtendPad: use your iPad as a wired second display for your Mac</title>
+<meta name="description" content="A tethered, Sidecar-style second display for iPads, old and new. Plug in a cable and your iPad becomes an extra screen for your Mac, with touch. No Wi-Fi, no account, no subscription.">
+<meta name="theme-color" content="#212126">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta property="og:title" content="ExtendPad: your iPad as a wired second display">
+<meta property="og:description" content="A tethered, Sidecar-style second display for iPads, old and new.">
+<meta property="og:image" content="assets/icon-512.png">
+<style>
+  :root {
+    --dark: #212126;
+    --darker: #17171a;
+    --card: #2a2a30;
+    --line: rgba(255,255,255,.09);
+    --text: #f4f4f6;
+    --muted: rgba(255,255,255,.62);
+    --faint: rgba(255,255,255,.38);
+    --orange: #ee7524;
+    --orange-hi: #f79a1a;
+    --radius: 22px;
+    --font: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--dark); color: var(--text);
+    font-family: var(--font); line-height: 1.55; -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  .wrap { width: min(1080px, 100% - 40px); margin-inline: auto; }
+
+  /* Nav */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
+  .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 20px; text-decoration: none; }
+  .brand img { width: 34px; height: 34px; border-radius: 8px; }
+  nav ul { display: flex; gap: 26px; list-style: none; margin: 0; padding: 0; font-size: 15px; color: var(--muted); }
+  nav ul a { text-decoration: none; }
+  nav ul a:hover { color: var(--text); }
+
+  /* Hero */
+  .hero { position: relative; text-align: center; padding: 56px 0 84px; overflow: hidden; }
+  .hero::before {
+    content: ""; position: absolute; left: 50%; top: 40%; width: 900px; height: 900px; translate: -50% -50%;
+    background: radial-gradient(closest-side, rgba(238,117,36,.22), transparent);
+    animation: pulse 9s ease-in-out infinite; pointer-events: none;
+  }
+  @keyframes pulse { 50% { opacity: .55; scale: 1.08; } }
+  @media (prefers-reduced-motion: reduce) { .hero::before { animation: none; } }
+  .hero > * { position: relative; }
+  .app-icon { width: 132px; height: 132px; border-radius: 30px; box-shadow: 0 18px 50px rgba(238,117,36,.35), 0 2px 0 rgba(255,255,255,.12) inset; }
+  .eyebrow { margin: 26px 0 0; font-size: 13px; font-weight: 600; letter-spacing: .22em; color: rgba(238,117,36,.85); text-transform: uppercase; }
+  h1 { font-size: clamp(36px, 6vw, 64px); line-height: 1.06; margin: 12px auto 0; max-width: 16ch; letter-spacing: -.02em; }
+  .lede { margin: 22px auto 0; max-width: 50ch; font-size: clamp(17px, 2vw, 20px); color: var(--muted); }
+  .cta { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 36px; }
+  .btn {
+    display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    min-width: 230px; padding: 14px 26px; border-radius: 16px; text-decoration: none; font-weight: 700; font-size: 17px;
+    border: 1px solid var(--line); transition: transform .15s ease, background .15s ease;
+  }
+  .btn small { font-size: 12px; font-weight: 500; opacity: .78; }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.primary { background: linear-gradient(160deg, var(--orange-hi), var(--orange)); color: #1b1004; border-color: transparent; }
+  .btn.secondary { background: var(--card); }
+  .btn[aria-disabled="true"] { opacity: .55; pointer-events: none; }
+  .fine { margin-top: 18px; font-size: 13px; color: var(--faint); }
+
+  /* Sections */
+  section { padding: 72px 0; }
+  section.alt { background: var(--darker); border-block: 1px solid var(--line); }
+  h2 { font-size: clamp(26px, 3.6vw, 38px); margin: 0 0 10px; letter-spacing: -.01em; }
+  .sub { color: var(--muted); max-width: 60ch; margin: 0 0 40px; }
+  .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; }
+  .card h3 { margin: 14px 0 6px; font-size: 18px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+  .ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: rgba(238,117,36,.14); color: var(--orange-hi); }
+  .ico svg { width: 24px; height: 24px; }
+
+  .steps { counter-reset: s; display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); padding: 0; list-style: none; margin: 0; }
+  .steps li { counter-increment: s; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; }
+  .steps li::before {
+    content: counter(s); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+    background: var(--orange); color: #1b1004; font-weight: 800; margin-bottom: 14px;
+  }
+  .steps b { display: block; font-size: 18px; margin-bottom: 4px; }
+  .steps span { color: var(--muted); font-size: 15px; }
+
+  table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; font-size: 15px; }
+  th, td { text-align: left; padding: 15px 20px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { width: 28%; color: var(--muted); font-weight: 600; }
+  tr:last-child th, tr:last-child td { border-bottom: 0; }
+  .tag { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 12px; font-weight: 700; background: rgba(238,117,36,.16); color: var(--orange-hi); margin-left: 6px; }
+
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 4px 22px; margin-bottom: 12px; }
+  summary { cursor: pointer; padding: 16px 0; font-weight: 600; font-size: 17px; list-style-position: outside; }
+  details p { margin: 0 0 18px; color: var(--muted); }
+  code { background: rgba(255,255,255,.08); padding: 1px 7px; border-radius: 6px; font-size: .92em; }
+
+  footer { padding: 44px 0 56px; color: var(--faint); font-size: 13px; text-align: center; border-top: 1px solid var(--line); }
+  footer p { margin: 4px 0; }
+  footer a { color: var(--muted); }
+
+  @media (max-width: 640px) {
+    nav ul { gap: 16px; font-size: 14px; }
+    nav ul li:nth-child(n+3) { display: none; }
+    th { width: 34%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="#top"><img src="assets/favicon.png" alt="" width="34" height="34">ExtendPad</a>
+    <ul>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#compat">Compatibility</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
+    </ul>
+  </nav>
+</div>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <img class="app-icon" src="assets/icon-512.png" alt="ExtendPad app icon: a laptop and an iPad joined by a cable" width="132" height="132">
+    <p class="eyebrow">Tethered iPad display</p>
+    <h1>Your iPad, as a wired second screen.</h1>
+    <p class="lede">A tethered, Sidecar-style display for iPads, old and new. Plug in a cable and your Mac gets an extra screen, with touch. No Wi-Fi, no account, no subscription.</p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/lowvoltageltd/extendpad-site/releases/latest/download/ExtendPad.dmg">Download for Mac<small>macOS 13 or later</small></a>
+      <a class="btn secondary" href="#" aria-disabled="true">iPad app on the App Store<small>coming soon</small></a>
+    </div>
+    <p class="fine">You need both: the Mac app (this download) and the iPad app.</p>
+  </div>
+</header>
+
+<section id="why">
+  <div class="wrap">
+    <h2>Use the hardware you already own</h2>
+    <p class="sub">That drawer iPad still has a great screen. ExtendPad puts it to work, without a monthly fee.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div>
+        <h3>Wired and fast</h3>
+        <p>Video and touch travel over the cable, so there's no Wi-Fi to set up and nothing to compete with on a busy network.</p>
+      </div>
+      <div class="card">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><circle cx="12" cy="17.5" r=".8" fill="currentColor"/></svg></div>
+        <h3>Old iPads welcome</h3>
+        <p>Runs on anything with iOS 15 or later, including the iPad mini 4 and iPad Air 2 that Apple's own Sidecar leaves out.</p>
+      </div>
+      <div class="card">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5a2 2 0 1 1 4 0v6m0 0V9a2 2 0 1 1 4 0v5a7 7 0 0 1-7 7h-1a6 6 0 0 1-5-3l-2-4a2 2 0 0 1 3-2l2 2V11"/></svg></div>
+        <h3>Touch included</h3>
+        <p>Tap and drag on the iPad to click and move things on the Mac.</p>
+      </div>
+      <div class="card">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <h3>Private by design</h3>
+        <p>No account, no analytics, no servers. Your screen goes down the cable to your iPad and nowhere else.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="how">
+  <div class="wrap">
+    <h2>Set up in a minute</h2>
+    <p class="sub">Install once, then it's just plug in and go.</p>
+    <ol class="steps">
+      <li><b>Install both apps</b><span>Download the Mac app and drag it to Applications. Install ExtendPad on your iPad from the App Store.</span></li>
+      <li><b>Allow two permissions</b><span>On the Mac, allow <em>Screen Recording</em> (to capture the extra display) and <em>Accessibility</em> (so iPad touches can click). macOS asks the first time.</span></li>
+      <li><b>Plug in and open</b><span>Connect the iPad with its cable and open ExtendPad on it. A new display appears in System Settings → Displays. Arrange it like any monitor.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section id="compat">
+  <div class="wrap">
+    <h2>Compatibility</h2>
+    <p class="sub">If it runs iOS 15 or later, it can be a display.</p>
+    <table>
+      <tr><th>Mac</th><td>macOS 13 Ventura or later (Apple silicon or Intel).</td></tr>
+      <tr><th>iPad</th><td>iOS / iPadOS 15 or later: iPad mini 4 and newer, iPad Air 2 and newer, iPad (5th gen) and newer, all iPad Pro models.</td></tr>
+      <tr><th>Cable</th><td>The cable your iPad charges with (Lightning or USB-C) into a USB port on your Mac.</td></tr>
+      <tr><th>Tested on</th><td>iPad mini 4 (iOS 15.8). <span class="tag">Newer iPads: rolling out</span></td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="alt" id="faq">
+  <div class="wrap">
+    <h2>Questions</h2>
+    <details><summary>Why do I need a Mac app as well?</summary><p>The Mac app creates the extra display and sends it to the iPad. iOS apps can't do that on their own, so the Mac side is a small menu-bar app you download here.</p></details>
+    <details><summary>Does it work over Wi-Fi?</summary><p>No, it's deliberately wired. That keeps it simple, reliable and independent of your network.</p></details>
+    <details><summary>Why does the Mac ask for Screen Recording and Accessibility?</summary><p>Screen Recording lets ExtendPad capture the extra display it creates (only that display, not your main screen). Accessibility lets it turn your iPad touches into mouse clicks. If you don't need touch, you can skip Accessibility.</p></details>
+    <details><summary>Is it laggy?</summary><p>It's tuned for responsiveness. Older iPads have less decoding power, so on a very old model you may get smoother results at a lower frame rate, which is a one-line setting in the source.</p></details>
+    <details><summary>Does it work with Windows?</summary><p>Not at the moment. ExtendPad is Mac + iPad.</p></details>
+    <details><summary>Is it affiliated with Apple?</summary><p>No. Sidecar is an Apple feature and a trademark of Apple Inc.; ExtendPad is an independent app that does something similar for iPads Sidecar doesn't cover.</p></details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Published by Low Voltage Ltd</p>
+    <p><a href="privacy.html">Privacy</a> · Apple, Mac, iPad, iPadOS and Sidecar are trademarks of Apple Inc.</p>
+  </div>
+</footer>
+
+</body>
+</html>
